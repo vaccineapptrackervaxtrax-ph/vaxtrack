@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Rabies Vaccine Tracker</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body class="bg-gray-100">
+	<!-- Container for the main content -->
+	<div class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-xl">
+		<div class="flex justify-center items-center mb-4">
+			<i class="fas fa-syringe text-5xl text-indigo-600 mr-4"></i>
+			<h1 class="text-5xl font-bold text-indigo-700">
+				Vaccine Tracker System
+			</h1>
+		</div>
+
+		<!-- User List Section -->
+		<div id="user-list-container">
+			<h2 class="text-3xl font-semibold text-gray-800 mb-6">User List</h2>
+			<table id="user-list"
+				class="w-full table-auto border-collapse border border-gray-300 rounded-lg overflow-hidden">
+				<thead>
+					<tr>
+						<th class="px-6 py-4 bg-indigo-600 text-white text-left text-lg font-medium">
+							Name
+						</th>
+						<th class="px-6 py-4 bg-indigo-600 text-white text-left text-lg font-medium">
+							Mobile Number
+						</th>
+						<th class="px-6 py-4 bg-indigo-600 text-white text-lg font-medium">
+							Action
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- User rows will be inserted here dynamically -->
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Edit User Form Section -->
+		<form id="edit-form" class="mt-10 bg-gray-50 p-8 rounded-lg shadow-md" onsubmit="updateUserData(event)">
+			<h2 class="text-3xl font-semibold text-center text-indigo-700 mb-6">
+				Edit User Information
+			</h2>
+
+			<input type="hidden" id="user-id" />
+
+			<!-- Input Fields -->
+			<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+				<div>
+					<label for="edit-name" class="block text-lg font-medium text-gray-700">Name</label>
+					<input type="text" id="edit-name" class="mt-1 block w-full p-4 border border-gray-300 rounded-md"
+						required />
+				</div>
+
+				<div>
+					<label for="edit-address" class="block text-lg font-medium text-gray-700">Address</label>
+					<input type="text" id="edit-address" class="mt-1 block w-full p-4 border border-gray-300 rounded-md"
+						required />
+				</div>
+
+				<div>
+					<label for="edit-age" class="block text-lg font-medium text-gray-700">Age</label>
+					<input type="number" id="edit-age" class="mt-1 block w-full p-4 border border-gray-300 rounded-md"
+						required />
+				</div>
+
+				<div>
+					<label for="edit-animalType" class="block text-lg font-medium text-gray-700">Animal Type</label>
+					<input type="text" id="edit-animalType"
+						class="mt-1 block w-full p-4 border border-gray-300 rounded-md" required />
+				</div>
+
+				<div>
+					<label for="edit-birthday" class="block text-lg font-medium text-gray-700">Birthday</label>
+					<input type="date" id="edit-birthday"
+						class="mt-1 block w-full p-4 border border-gray-300 rounded-md" required />
+				</div>
+
+				<div>
+					<label for="edit-bittenByAnimal" class="block text-lg font-medium text-gray-700">Bitten by
+						Animal</label>
+					<input type="text" id="edit-bittenByAnimal"
+						class="mt-1 block w-full p-4 border border-gray-300 rounded-md" required />
+				</div>
+
+				<div>
+					<label for="edit-email" class="block text-lg font-medium text-gray-700">Email</label>
+					<input type="email" id="edit-email" class="mt-1 block w-full p-4 border border-gray-300 rounded-md"
+						required />
+				</div>
+
+				<div>
+					<label for="edit-gender" class="block text-lg font-medium text-gray-700">Gender</label>
+					<input type="text" id="edit-gender" class="mt-1 block w-full p-4 border border-gray-300 rounded-md"
+						required />
+				</div>
+
+				<div>
+					<label for="edit-mobileNumber" class="block text-lg font-medium text-gray-700">Mobile Number</label>
+					<input type="text" id="edit-mobileNumber"
+						class="mt-1 block w-full p-4 border border-gray-300 rounded-md" required />
+				</div>
+
+				<!-- Vaccine Date and Schedule -->
+
+				<!-- Vaccine Date -->
+				<div>
+					<label for="edit-vaccineDate" class="block text-lg font-medium text-gray-700">
+						Vaccine Date
+					</label>
+					<input type="date" id="edit-vaccineDate"
+						class="mt-1 block w-full p-4 border border-gray-300 rounded-md" />
+				</div>
+
+				<!-- Vaccinated Before -->
+				<div>
+					<label for="edit-vaccinatedBefore" class="block text-lg font-medium text-gray-700">Have you been
+						vaccinated before?</label>
+					<select id="edit-vaccinatedBefore" class="mt-1 block w-full p-4 border border-gray-300 rounded-md"
+						required>
+						<option value="yes">Yes</option>
+						<option value="no">No</option>
+					</select>
+				</div>
+
+				<!-- Vaccine Schedule (dynamic) -->
+				<div id="schedule-container" class="col-span-2 mt-6">
+					<h3 class="text-2xl font-semibold text-gray-800 flex items-center gap-3">
+						Vaccine Schedule
+						<span class="text-sm font-normal text-gray-500">
+							(tick “Done” after a shot is completed)
+						</span>
+					</h3>
+
+					<!-- dynamic rows are rendered here -->
+					<div id="vaccine-schedule" class="mt-3 space-y-3"></div>
+				</div>
+
+				<!-- Template for a single shot row -->
+				<template id="shot-row-tpl">
+					<div class="shot-row flex items-center justify-between rounded-md border border-gray-200 p-4"
+						data-key="" data-day="">
+						<div class="text-gray-800">
+							<div class="font-medium shot-title">Shot</div>
+							<div class="text-sm text-gray-500 shot-meta">
+								Day X • DD/MM/YYYY
+							</div>
+						</div>
+						<label class="inline-flex items-center gap-2 select-none">
+							<input type="checkbox" class="shot-done h-5 w-5 rounded border-gray-300" />
+							<span class="text-gray-700">Done</span>
+						</label>
+					</div>
+				</template>
+			</div>
+
+			<!-- Submit Button -->
+			<div class="mt-6 text-center">
+				<button type="submit"
+					class="px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-300">
+					Update
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<script type="module">
+		// Import the necessary Firebase SDKs
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+		import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
+		import {
+			getDatabase,
+			ref,
+			get,
+			update,
+			set,
+			remove,
+			push,
+			serverTimestamp,
+			query,
+			orderByChild,
+			equalTo,
+			limitToFirst,
+		} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+		// Firebase configuration
+		const firebaseConfig = {
+			apiKey: "AIzaSyDLcFC8lBkx5Q-ZgAYfhq8ljt8Vn46WBwo",
+			authDomain: "vaccineapp-d1f4f.firebaseapp.com",
+			databaseURL:
+				"https://vaccineapp-d1f4f-default-rtdb.asia-southeast1.firebasedatabase.app",
+			projectId: "vaccineapp-d1f4f",
+			storageBucket: "vaccineapp-d1f4f.firebasestorage.app",
+			messagingSenderId: "707238114179",
+			appId: "1:707238114179:web:8de7d0cb49de55e5163cb6",
+			measurementId: "G-QLQ4JXG12M",
+		};
+
+		// Initialize Firebase
+		const app = initializeApp(firebaseConfig);
+		const analytics = getAnalytics(app);
+		const db = getDatabase(app);
+
+		window.displayUserData = function (data) {
+			console.log("Displaying user data:", data);
+			const userListTable = document
+				.getElementById("user-list")
+				.getElementsByTagName("tbody")[0];
+
+			// Add new row for the user
+			const row = userListTable.insertRow();
+			row.classList.add("border-b", "border-gray-300"); // Add borders to each row
+
+			// Add user name and mobile number columns
+			const nameCell = row.insertCell(0);
+			nameCell.textContent = data.name;
+			nameCell.classList.add("px-6", "py-4", "text-lg", "text-gray-800");
+
+			const mobileCell = row.insertCell(1);
+			mobileCell.textContent = data.mobileNumber;
+			mobileCell.classList.add("px-6", "py-4", "text-lg", "text-gray-800");
+
+			// Add Edit, Delete, and Green Button
+			const actionsCell = row.insertCell(2);
+			actionsCell.classList.add("px-6", "py-4");
+			actionsCell.classList.add("flex", "space-x-4", "justify-end"); // Flexbox to align buttons
+
+			// Edit button
+			const editButton = document.createElement("button");
+			editButton.textContent = "Edit";
+			editButton.classList.add(
+				"px-4",
+				"py-2",
+				"bg-blue-600",
+				"text-white",
+				"rounded-md",
+				"hover:bg-blue-700",
+				"transition",
+				"duration-300"
+			);
+
+			// Attach the correct userId to the button's click event
+			editButton.addEventListener("click", function () {
+				// When Edit is clicked, populate the form with the correct user data
+				editUserData(data);
+			});
+
+			actionsCell.appendChild(editButton);
+
+			// Delete button
+			const deleteButton = document.createElement("button");
+			deleteButton.textContent = "Delete";
+			deleteButton.classList.add(
+				"px-4",
+				"py-2",
+				"bg-red-600",
+				"text-white",
+				"rounded-md",
+				"hover:bg-red-700",
+				"transition",
+				"duration-300"
+			);
+			deleteButton.addEventListener("click", function () {
+				deleteUserData(data.id);
+			});
+			actionsCell.appendChild(deleteButton);
+
+			// Green button (Approve/Confirm)
+			const greenButton = document.createElement("button");
+			greenButton.textContent = "Approve";
+			greenButton.classList.add(
+				"px-4",
+				"py-2",
+				"bg-green-600",
+				"text-white",
+				"rounded-md",
+				"hover:bg-green-700",
+				"transition",
+				"duration-300"
+			);
+			greenButton.addEventListener("click", function () {
+				approveUserData(data.id); // Add your action for the green button
+			});
+			actionsCell.appendChild(greenButton);
+
+			document.getElementById("user-id").value = data.id;
+			console.log("User ID stored:", data.id);
+		};
+
+		// ===== Shots UI: render & collect =====
+		function renderShots(source) {
+			const container = document.getElementById("vaccine-schedule");
+			const tpl = document.getElementById("shot-row-tpl");
+			container.innerHTML = "";
+
+			let map = {};
+			if (Array.isArray(source)) {
+				source.forEach((s, i) => (map[`shot ${i + 1}`] = s));
+			} else {
+				map = source || {};
+			}
+
+			const keys = Object.keys(map).sort((a, b) => {
+				const na = parseInt((a.match(/\d+/) || [0])[0], 10);
+				const nb = parseInt((b.match(/\d+/) || [0])[0], 10);
+				return na - nb;
+			});
+
+			if (!keys.length) {
+				container.innerHTML = `<div class="text-sm text-gray-500">No schedule yet. Set a Vaccine Date above to generate.</div>`;
+				return;
+			}
+
+			keys.forEach((key) => {
+				const shot = map[key] || {};
+				const node = tpl.content.firstElementChild.cloneNode(true);
+				node.dataset.key = key;
+				node.dataset.day = shot.day ?? "";
+				node.querySelector(".shot-title").textContent = `${key
+					.charAt(0)
+					.toUpperCase()}${key.slice(1)}`;
+				node.querySelector(".shot-meta").textContent = `Day ${shot.day ?? "?"
+					} • ${shot.date ?? "??/??/????"}`;
+
+				const cb = node.querySelector(".shot-done");
+				const done = shot.status === "done" || shot.done === true;
+				cb.checked = !!done;
+
+				container.appendChild(node);
+			});
+		}
+
+		function collectShotStatuses() {
+			const rows = Array.from(
+				document.querySelectorAll("#vaccine-schedule .shot-row")
+			);
+			const out = {};
+			rows.forEach((row, i) => {
+				const key = row.dataset.key || `shot ${i + 1}`;
+				const meta = row.querySelector(".shot-meta").textContent || "";
+				const day = row.dataset.day || (meta.match(/Day\s+(\d+)/)?.[1] ?? "");
+				const date = (meta.match(/•\s*(.+)$/)?.[1] ?? "").trim();
+				const done = row.querySelector(".shot-done").checked;
+				out[key] = {
+					day: String(day),
+					date,
+					status: done ? "done" : "pending",
+					done,
+				};
+			});
+			return out;
+		}
+
+
+		// ===== Data Loading helpers =====
+		async function getLatestHistory(userId) {
+			try {
+				const histRef = ref(db, `history/${userId}`);
+				const snap = await get(histRef);
+				if (!snap.exists()) return null;
+				let latest = null,
+					latestTime = -1;
+				snap.forEach((child) => {
+					const v = child.val();
+					const t =
+						typeof v.savedAt === "number"
+							? v.savedAt
+							: v.savedAt?.seconds ?? -1;
+					if (t > latestTime) {
+						latest = v;
+						latestTime = t;
+					}
+				});
+				return latest;
+			} catch {
+				return null;
+			}
+		}
+
+		// =============== NEW: load vaccines/<userId> and render with checkboxes ===============
+		async function loadAndRenderVaccines(userId) {
+			try {
+				const vref = ref(db, `vaccines/${userId}`);
+				const vsnap = await get(vref);
+				if (vsnap.exists()) {
+					renderShots(vsnap.val());
+				} else {
+					const vaccineDate =
+						document.getElementById("edit-vaccineDate").value;
+					const vaccinatedBefore = document.getElementById(
+						"edit-vaccinatedBefore"
+					).value;
+					if (vaccineDate)
+						renderShots(
+							generateVaccineSchedule(vaccineDate, vaccinatedBefore)
+						);
+					else renderShots([]);
+				}
+			} catch (e) {
+				console.error("loadAndRenderVaccines error:", e);
+			}
+		}
+
+		function canonicalize(obj) {
+			if (obj === null || typeof obj !== "object") return obj;
+			if (Array.isArray(obj)) return obj.map(canonicalize);
+			const out = {};
+			Object.keys(obj)
+				.sort()
+				.forEach((k) => (out[k] = canonicalize(obj[k])));
+			return out;
+		}
+
+		async function sha256(text) {
+			const buf = new TextEncoder().encode(text);
+			const hash = await crypto.subtle.digest("SHA-256", buf);
+			return [...new Uint8Array(hash)]
+				.map((b) => b.toString(16).padStart(2, "0"))
+				.join("");
+		}
+		// Stable JSON string (order keys) for fingerprinting history
+		function stableStringify(obj) {
+			const allKeys = [];
+			JSON.stringify(obj, (k, v) => (allKeys.push(k), v));
+			allKeys.sort();
+			return JSON.stringify(obj, allKeys);
+		}
+
+		async function appendVaccineHistoryIfNew(userId, payload) {
+			const historyRef = ref(db, `history/${userId}`);
+			const fp = stableStringify({
+				vaccineDate: payload.vaccineDate ?? "",
+				vaccinatedBefore: (payload.vaccinatedBefore ?? "").toLowerCase(),
+				shots: payload.shots || {},
+			});
+
+			const snap = await get(historyRef);
+			let duplicate = false;
+			if (snap.exists()) {
+				snap.forEach((child) => {
+					const v = child.val();
+					if (v && v._fingerprint === fp) duplicate = true;
+				});
+			}
+			if (duplicate) return "skipped (duplicate)";
+
+			const entryRef = push(historyRef);
+			await set(entryRef, {
+				...payload,
+				_fingerprint: fp,
+				savedAt: serverTimestamp(),
+			});
+			return "appended";
+		}
+		// Helper: safe setter (no optional chaining on the LHS)
+		function setVal(id, value) {
+			const el = document.getElementById(id);
+			if (el) el.value = value ?? "";
+		}
+		// ===== Edit (prefill) & Update (save) =====
+		// ------------ PUBLIC: edit & update ------------
+		async function editUserData(data) {
+			// Core fields
+			setVal("edit-name", data.name);
+			setVal("edit-address", data.address);
+			setVal("edit-age", data.age);
+			setVal("edit-animalType", data.animalType);
+			setVal("edit-birthday", data.birthday);
+			setVal("edit-bittenByAnimal", data.bittenByAnimal);
+			setVal("edit-email", data.email);
+			setVal("edit-gender", data.gender);
+			setVal("edit-mobileNumber", data.mobileNumber);
+			setVal("user-id", data.id);
+
+			// Prefill Vaccine Date / Vaccinated Before: latest history → first shot → user field
+			let prefillDate = "";
+			let prefillPrev = "";
+
+			const latest = await getLatestHistory(data.id);
+			if (latest) {
+				if (latest.vaccinatedBefore) prefillPrev = String(latest.vaccinatedBefore).toLowerCase();
+				if (/^\d{4}-\d{2}-\d{2}$/.test(latest.vaccineDate || "")) prefillDate = latest.vaccineDate;
+			}
+
+			if (!prefillDate) {
+				const s1 = await get(ref(db, `vaccines/${data.id}/shot 1`));
+				if (s1.exists()) {
+					const m = String(s1.val().date || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+					if (m) prefillDate = `${m[3]}-${m[2]}-${m[1]}`;
+				}
+			}
+
+			if (!prefillDate && /^\d{4}-\d{2}-\d{2}$/.test(data.vaccineDate || "")) {
+				prefillDate = data.vaccineDate;
+			}
+
+			if (prefillDate) setVal("edit-vaccineDate", prefillDate);
+			if (prefillPrev) setVal("edit-vaccinatedBefore", prefillPrev);
+
+			// Render current vaccines
+			await loadAndRenderVaccines(data.id);
+
+			// Rerender schedule when inputs change (no DB write until Update)
+			const vaccineDateInput = document.getElementById("edit-vaccineDate");
+			const vaccinatedBeforeSelect = document.getElementById("edit-vaccinatedBefore");
+			const rerender = () => {
+				if (!vaccineDateInput || !vaccineDateInput.value) return;
+				renderShots(
+					generateVaccineSchedule(
+						vaccineDateInput.value,
+						(vaccinatedBeforeSelect && vaccinatedBeforeSelect.value) || ""
+					)
+				);
+			};
+			if (vaccineDateInput) vaccineDateInput.onchange = rerender;
+			if (vaccinatedBeforeSelect) vaccinatedBeforeSelect.onchange = rerender;
+		}
+
+		// ===== Schedule generation =====
+		function generateVaccineSchedule(vaccineDate, vaccinatedBefore) {
+			if (!vaccineDate) return [];
+			const days =
+				String(vaccinatedBefore).toLowerCase() === "yes"
+					? ["0", "3"]
+					: ["0", "3", "7", "14"];
+			return days.map((day) => {
+				const d = new Date(vaccineDate);
+				d.setDate(d.getDate() + parseInt(day, 10));
+				return { day, date: formatDate(d), status: "pending", done: false };
+			});
+		}
+		window.editUserData = editUserData;
+
+		// Helper function to format the date as dd/mm/yyyy
+		function formatDate(date) {
+			const day = String(date.getDate()).padStart(2, "0");
+			const month = String(date.getMonth() + 1).padStart(2, "0");
+			const year = date.getFullYear();
+			return `${day}/${month}/${year}`;
+		}
+
+		async function appendVaccineHistory(userId, payload) {
+			return appendVaccineHistoryIfNew(userId, payload);
+		}
+
+		async function updateUserData(event) {
+			if (event?.preventDefault) event.preventDefault();
+
+			try {
+				const byId = (id) => document.getElementById(id);
+				const getVal = (id) => (byId(id)?.value ?? "").trim();
+				const userId = getVal("user-id");
+				if (!userId) { alert("Missing user ID."); return false; }
+
+				// 1) Save core profile
+				const updatedData = {
+					name: getVal("edit-name"),
+					address: getVal("edit-address"),
+					age: getVal("edit-age"),
+					animalType: getVal("edit-animalType"),
+					birthday: getVal("edit-birthday"),
+					bittenByAnimal: getVal("edit-bittenByAnimal"),
+					email: getVal("edit-email"),
+					gender: getVal("edit-gender"),
+					mobileNumber: getVal("edit-mobileNumber"),
+					vaccineDate: getVal("edit-vaccineDate") || undefined // keep if you also store it on user
+				};
+				await update(ref(db, `users/${userId}`), updatedData);
+
+				// 2) Save shots from UI
+				const uiShots = collectShotStatuses();
+				const keys = Object.keys(uiShots);
+				let wrote = 0;
+
+				for (const key of keys) {
+					const s = uiShots[key];
+					await update(ref(db, `vaccines/${userId}/${key}`), {
+						day: String(s.day ?? ""),
+						date: s.date ?? "",
+						status: s.done ? "done" : "pending",
+						done: !!s.done,
+						doneAt: s.done ? serverTimestamp() : null
+					});
+					wrote++;
+				}
+
+				// If no UI rows yet but base date is picked, create schedule now
+				if (!keys.length) {
+					const baseDate = getVal("edit-vaccineDate");
+					if (baseDate) {
+						const arr = generateVaccineSchedule(baseDate, getVal("edit-vaccinatedBefore"));
+						const map = {};
+						arr.forEach((s, i) => (map[`shot ${i + 1}`] = s));
+						await set(ref(db, `vaccines/${userId}`), map);
+						wrote = arr.length;
+					}
+				}
+
+				// 3) Append history (dedup)
+				const histPayload = {
+					vaccineDate: getVal("edit-vaccineDate") || undefined,
+					vaccinatedBefore: getVal("edit-vaccinatedBefore") || undefined,
+					shots: uiShots
+				};
+				const histResult = await appendVaccineHistoryIfNew(userId, histPayload);
+
+				alert([
+					"User info saved.",
+					wrote ? `Vaccines updated (${wrote}).` : "No vaccine changes.",
+					`History ${histResult}.`
+				].join(" ")); location.reload();
+
+				if (typeof window.fetchData === "function") window.fetchData();
+				return false;
+			} catch (e) {
+				console.error("Update failed:", e);
+				alert("Error updating data: " + (e?.message || e));
+				return false;
+			}
+		}
+
+		// Attach AFTER functions are defined (avoids the left-hand-side parse issue)
+		window.updateUserData = updateUserData;
+
+		// ===== Optional: auto-load by ?id=USERID if your page uses query param
+		document.addEventListener("DOMContentLoaded", async () => {
+			const params = new URLSearchParams(location.search);
+			const userId = params.get("id");
+			if (!userId) return;
+			const snap = await get(ref(db, `users/${userId}`));
+			if (snap.exists()) {
+				const data = { id: userId, ...snap.val() };
+				await window.editUserData(data);
+			}
+		});
+
+		window.deleteUserData = function (userId) {
+			console.log("Deleting user data:", userId);
+			const userRef = ref(db, `users/${userId}`);
+			remove(userRef)
+				.then(() => {
+					console.log("User data deleted successfully!");
+					alert("User data deleted successfully!");
+					fetchData();
+				})
+				.catch((error) => {
+					console.error("Error deleting data: ", error);
+					alert("Error deleting data: " + error.message);
+				});
+		};
+
+		window.onload = function () {
+			console.log("Page loaded, fetching data...");
+			fetchData();
+		};
+
+		window.fetchData = function () {
+			const userRef = ref(db, "users");
+			console.log("Fetching user data...");
+
+			get(userRef)
+				.then((snapshot) => {
+					if (snapshot.exists()) {
+						const usersData = snapshot.val();
+						console.log("Fetched users data:", usersData);
+
+						const userListTable = document
+							.getElementById("user-list")
+							.getElementsByTagName("tbody")[0];
+						userListTable.innerHTML = "";
+
+						for (const userId in usersData) {
+							if (usersData.hasOwnProperty(userId)) {
+								const userData = usersData[userId];
+								userData.id = userId;
+								displayUserData(userData);
+							}
+						}
+					} else {
+						console.log("No data available");
+					}
+				})
+				.catch((error) => {
+					console.error("Error reading data: ", error);
+				});
+		};
+	</script>
+</body>
+
+</html>
