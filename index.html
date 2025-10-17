@@ -254,41 +254,41 @@
 
 			actionsCell.appendChild(editButton);
 
-			// Delete button
-			const deleteButton = document.createElement("button");
-			deleteButton.textContent = "Delete";
-			deleteButton.classList.add(
-				"px-4",
-				"py-2",
-				"bg-red-600",
-				"text-white",
-				"rounded-md",
-				"hover:bg-red-700",
-				"transition",
-				"duration-300"
-			);
-			deleteButton.addEventListener("click", function () {
-				deleteUserData(data.id);
-			});
-			actionsCell.appendChild(deleteButton);
+			// // Delete button
+			// const deleteButton = document.createElement("button");
+			// deleteButton.textContent = "Delete";
+			// deleteButton.classList.add(
+			// 	"px-4",
+			// 	"py-2",
+			// 	"bg-red-600",
+			// 	"text-white",
+			// 	"rounded-md",
+			// 	"hover:bg-red-700",
+			// 	"transition",
+			// 	"duration-300"
+			// );
+			// deleteButton.addEventListener("click", function () {
+			// 	deleteUserData(data.id);
+			// });
+			// actionsCell.appendChild(deleteButton);
 
-			// Green button (Approve/Confirm)
-			const greenButton = document.createElement("button");
-			greenButton.textContent = "Approve";
-			greenButton.classList.add(
-				"px-4",
-				"py-2",
-				"bg-green-600",
-				"text-white",
-				"rounded-md",
-				"hover:bg-green-700",
-				"transition",
-				"duration-300"
-			);
-			greenButton.addEventListener("click", function () {
-				approveUserData(data.id); // Add your action for the green button
-			});
-			actionsCell.appendChild(greenButton);
+			// // Green button (Approve/Confirm)
+			// const greenButton = document.createElement("button");
+			// greenButton.textContent = "Approve";
+			// greenButton.classList.add(
+			// 	"px-4",
+			// 	"py-2",
+			// 	"bg-green-600",
+			// 	"text-white",
+			// 	"rounded-md",
+			// 	"hover:bg-green-700",
+			// 	"transition",
+			// 	"duration-300"
+			// );
+			// greenButton.addEventListener("click", function () {
+			// 	approveUserData(data.id); // Add your action for the green button
+			// });
+			// actionsCell.appendChild(greenButton);
 
 			document.getElementById("user-id").value = data.id;
 			console.log("User ID stored:", data.id);
